@@ -1,0 +1,23 @@
+
+;; bug in clojurescript
+;; test (when = "Enter" (.-key ev)) always yields true ,
+;; whereas (if = "Enter" (.-key ev)) only true when enter key pressed
+
+
+(def txt (reagent/atom ""))
+
+(defn hello-world []
+  [:div
+   [:h1 (:text "hello world")]
+   [:div [:input {:type "text"
+                  :value @txt
+                  :on-change (fn [ev] (reset! txt (-> ev .-target .-value)))
+                  :placeholder "something to do..."
+                  :on-key-up (fn [ev] ;;(if (= "Enter" (.-key ev))
+                                        (when (= "Enter" (.-key ev)
+                                                 (reset! txt "")
+                                                 (println "We are here " (.-key ev) (= "Enter" (.-key ev)))
+                                                 ))))}]
+    [:button {:on-click (fn [e] (swap! c 1 ))}
+     "add todo item"] ]])
+

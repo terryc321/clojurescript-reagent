@@ -1,0 +1,320 @@
+
+
+https://cljs.info/cheatsheet/
+//////////////////////////////////////////////////////////////////////////
+Reagent + Clojure
+
+actually React.js javascript but internals react are hidden from us .
+How best to develop the application.
+main problem is that clojure is functional programming and i want to be able to
+mutate some things.
+///////////////////////////////////////////////////////////////////////////////////
+
+1 To do app - add delete update things to do.
+2 Temperature application - celsius fahrenheit.
+3 
+
+these applications are easy to write in javascript as long as you dont look too hard.
+///////////////////////////////////////////////////////////////////////////
+(swap! c inc)  ;; applies procedure inc to c , and changes c value
+(reset! c 5)   ;; simply replaces c value with 5
+
+
+////////////////////////////////////////////////////////////////////////////
+ :on-change #(reset! val (-> % .-target .-value))
+
+shorthand for
+ :on-change (fn [ev] (reset! val (-> ev .-target .-value)))
+but think long hand version has some advantages ?
+
+
+////////////////////////////////////////////////////////////////////////////
+radio buttons ?
+
+////////////////////////////////////////////////////////////////////////////
+simple form using reagent
+
+submit button
+////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////
+
+(println "this is printed to javascript console")
+(defn hello-world []
+ [:h1 "hello world"])
+
+
+(defn hello-world []
+ [:div
+  [:p "this is some text"]
+  ])
+
+/////////////////////////////////////////////////////////////////////////
+
+;; simple counter
+
+(def c (reagent/atom 1))
+
+(defn hello-world []
+  [:div
+   [:button {:on-click (fn [e] (swap! c inc))} @c]
+   ])
+
+(reagent/render-component [hello-world]
+                          (. js/document (getElementById "app")))
+
+
+/////////////////////////////////////////////////////////////////////////
+  [:div
+   [:h1 "This is the Header!"]
+   [:p "hello world"]
+   [:p "second paragraph"]
+/////////////////////////////////////////////////////////////////////////
+
+[:button {:on-click (fn [] (println "hello world"))}  "click me"]
+
+/////////////////////////////////////////////////////////////////////////
+
+set text of a button when clicked ?
+think about rather trying to traverse dom to find element,
+simply set a variable , read from that variable.
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////
+
+anchor link
+
+[:a {:href "https://timothypratley.blogspot.com/2017/01/reagent-deep-dive-part-1.html"} "reagent deep dive"]
+
+////////////////////////////////////////////////////////////////////////
+image
+[:img
+ {:src "https://avatars1.githubusercontent.com/u/9254615?v=3&s=150"}]
+
+
+/////////////////////////////////////////////////////////////////////////
+
+[:button
+ {:on-click
+  (fn [e]
+    (js/alert "You pressed the button!"))}
+ "Do not press"]
+
+/////////////////////////////////////////////////////////////////////////
+
+[:p
+ {:style {:color "white"
+          :background "darkblue"}}
+ "Such style!"]
+
+/////////////////////////////////////////////////////////////////////////
+[:div
+ {:id "my-id"
+  :className "my-class1 my-class2"}]
+  
+/////////////////////////////////////////////////////////////////////////
+(defn concentric-circles []
+  [:svg {:style {:border "1px solid"
+                 :background "white"
+                 :width "150px"
+                 :height "150px"}}
+   [:circle {:r 50, :cx 75, :cy 75, :fill "green"}]
+   [:circle {:r 25, :cx 75, :cy 75, :fill "blue"}]
+   [:path {:stroke-width 12
+           :stroke "white"
+           :fill "none"
+           :d "M 30,40 C 100,40 50,110 120,110"}]])
+
+;; call it with square brackets around routine
+[concentric-cirles]
+
+////////////////////////////////////////////////////////////////////////
+
+(defn concentric-circles []
+  [:svg {:style {:border "1px solid"
+                 :background "white"
+                 :width "150px"
+                 :height "150px"}}
+   [:circle {:r 50, :cx 75, :cy 75, :fill "green"}]
+   [:circle {:r 25, :cx 75, :cy 75, :fill "blue"}]
+   [:path {:stroke-width 12
+           :stroke "white"
+           :fill "none"
+           :d "M 30,40 C 100,40 50,110 120,110"}]])
+
+(defn many-circles []
+  (into
+   [:svg {:style {:border "1px solid"
+                  :background "white"
+                  :width "600px"
+                  :height "600px"}}]
+   (for [i (range 12)]
+     [:g
+      {:transform (str
+                   "translate(300,300) "
+                   "rotate(" (* i 30) ") "
+                   "translate(100)")}
+      [concentric-circles]]))) 
+
+
+[many-circles]
+
+/////////////////////////////////////////////////////////////////////////
+(def c  (reagent/atom 1))
+
+(defn counter []
+  [:div
+   [:div "Current counter value: " @c]
+   [:button
+    {:disabled (>= @c 4)
+     :on-click
+     (fn clicked [e]
+       (swap! c inc))}
+    "inc"]
+   [:button
+    {:disabled (<= @c 1)
+     :on-click
+     (fn clicked [e]
+       (swap! c dec))}
+    "dec"]
+   (into [:div] (repeat @c [concentric-circles]))])
+
+////////////////////////////////////////////////////////////////////////
+
+;; here is a value
+(def c (reagent/atom 1))
+
+;; @
+(swap! c dec)
+(swap! c inc)
+
+
+
+////////////////////////////////////////////////////////////////////////
+{:on-submit
+     (fn [e]
+       (.preventDefault e)
+       (js/alert
+        (str "You said: " (.. e -target -elements -message -value))))}
+    
+
+////////////////////////////////////////////////////////////////////////
+[:input {:type "text"
+            :on-change (fn [ev] (reset! txt (-> ev .-target .-value)))
+            :placeholder "type something"}]
+   [:button {:on-click (fn [e] (swap! c inc))} @c]
+   [:p @txt]
+   [:p @c]
+
+   [:form
+    {:on-submit
+     (fn [e]
+       (.preventDefault e)
+       (js/alert
+        (str "You said: " (.. e -target -elements -message -value))))}
+    [:label "Say something:"
+     [:input  {:name "message"
+       :type "text"
+       :default-value "Hello"}]
+     [:input {:type "submit"}]]]
+////////////////////////////////////////////////////////////////////////
+   
+   
+
+
+////////////////////////////////////////////////////////////////////////
+[:div
+ [:h3 "Greetings human"]
+ [:form
+  {:on-submit
+   (fn [e]
+     (.preventDefault e)
+     (js/alert
+      (str "You said: " (.. e -target -elements -message -value))))}
+  [:label
+   "Say something:"
+   [:input
+    {:name "message"
+     :type "text"
+     :default-value "Hello"}]]
+  [:input {:type "submit"}]]]
+  
+///////////////////////////////////////////////////////////////////////////////////
+
+(defn hello-world []
+  [:div
+   [:h1 (:text @app-state)]
+   [:h3 "Edit this "]
+      [:p {:class "greeting"} "the greeting"]
+;;   [:p {:class "greeting " :style "color:blue"} "the greeting"]
+;;   [:p {:class "greeting", :style "color: blue"} "this is my greeting "]
+   [:button {:text "hello world" 
+             :on-click (fn [_] (println "you clied me"))
+             ;;           on-click (fn [_]) (reset! selected-department "test!")
+             }
+    "hello world"]
+   
+   [:button { ;;:text @my-label ;;"alerty button"
+             ;;:name "namey-button"
+             ;;:value @my-label
+             :on-click (fn [_] (js/alert  (if true "foo" "bar")))
+             ;;           on-click (fn [_]) (reset! selected-department "test!")
+             }
+    "asdf"]
+   [:div [:input {:type "text" :name "fname"
+                  :on-change (fn [evt]
+                               (reset! my-label "test!")
+                               (println "test if this works")
+                               (println (-> evt .-target .-value)))
+                  }
+          ]]
+   [:ul (for [name ["alpha" "bravo" "charlie"]]
+          [:li {:key name :id name} name])     
+    ]])
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+(ns hello2.core
+    (:require [reagent.core :as reagent :refer [atom]]))
+
+(enable-console-print!)
+
+(println "This text is printed from src/hello2/core.cljs. Go ahead and edit it and see reloading in action.")
+
+;; define your app data so that it doesn't get over-written on reload
+
+;;(defonce app-state (atom {:text "Hello world 2!"}))
+
+;;(defonce selected-department (atom department))
+
+(defonce app-state (atom {:text "Hello world 2.3!"}))
+
+(defn hello-world []
+  [:div
+   [:h1 (:text @app-state)]
+   [:h3 "Edit this "]
+   [:button {:text "hello world" 
+             :on-click (fn [_] (println "you clied me"))
+             
+             ;;           on-click (fn [_]) (reset! selected-department "test!")
+             }
+    "hello worl"]])  
+
+
+
+(reagent/render-component [hello-world]
+                          (. js/document (getElementById "app")))
+
+(defn on-js-reload []
+  ;; optionally touch your app-state to force rerendering depending on
+  ;; your application
+  ;; (swap! app-state update-in [:__figwheel_counter] inc)
+  )
+
+

@@ -1,0 +1,89 @@
+(ns hello2.core
+    (:require [reagent.core :as reagent :refer [atom]]))
+
+(enable-console-print!)
+
+
+(println "This text is printed from src/hello2/core.cljs. Go ahead and edit it and see reloading in action.")
+
+;; define your app data so that it doesn't get over-written on reload
+;;(defonce app-state (atom {:text "Hello world 2!"}))
+;;(defonce selected-department (atom department))
+;;(defonce app-state (atom {:text "Hello world 2.3!"}))
+
+(defonce app-state (atom {:text (str "Hello world 2.3!" (+ 1 2 3))}))
+
+
+;; to do application
+(def c (reagent/atom 1))
+
+(def item (reagent/atom ""))
+(def items (reagent/atom ["alpha","beta","charlie","delta"] ))
+
+
+;; add item to tasks
+(defn add-item-to-tasks [x]
+  (reset! items (conj items x))
+  (println "added item to tasks ")
+  (println items))
+
+
+
+;; (defn task-list-components []
+;;   [:ul
+;;    (for [(index task) (map-indexed vector @items)]
+;;      ^{:key index}
+;;      [:li task])])
+
+
+(defn li-shout [x]
+  [:li x])
+  ;;;[:li (clojure.string/uppercase x)])
+
+(defn task-list-components []
+  (concat [:ol] (map li-shout items)))
+
+;; (defn hello-world []
+;;   [:div
+;;    [:h1 (:text "hello world")]
+;;    [:div [:input {:type "text"
+;;                   :value @item
+;;                   :on-change (fn [ev] (reset! item (-> ev .-target .-value)))
+;;                   :placeholder "something to do..."
+;;                   :on-key-up (fn [ev] (if (= "Enter" (.-key ev)) (when (= "Enter" (.-key ev)
+;;                                                                           [add-item-to-tasks (.-key ev)]
+;;                                                                           (println @item)
+;;                                                                           (reset! item "")
+;;                                                                           (println "We are here " (.-key ev) (= "Enter" (.-key ev)))
+;;                                                                           ))))
+;;                   }]
+;;     [:button {:on-click (fn [e] (swap! c 1 ))}
+;;      "add todo item"]]
+
+;;    [:p "hello "]
+
+;;    [task-list-components]
+
+;; ])
+
+(defn hello-world []
+  [:div
+   [:h1 (:text "hello world")]
+   [:p "are we ready?"]
+   [task-list-components]
+   ])
+
+
+
+
+  
+  
+(reagent/render-component [hello-world]
+                          (. js/document (getElementById "app")))
+
+
+(defn on-js-reload []
+  ;; optionally touch your app-state to force rerendering depending on
+  ;; your application
+  ;; (swap! app-state update-in [:__figwheel_counter] inc)
+  )
